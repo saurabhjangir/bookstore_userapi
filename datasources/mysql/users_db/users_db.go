@@ -2,24 +2,33 @@ package users_db
 
 import (
 	"database/sql"
-	_ "github.com/go-sql-driver/mysql"
 	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"os"
 )
 
 const (
-	db_userid = "saurabh"
-	db_userpassword = "January.2020"
-	db_name = "usersDB"
-	db_host = "127.0.0.1"
-	db_port = "3306"
+	dbuserid       = "DBUSERID"
+	dbuserpassword = "DBUSERPASSWORD"
+	dbname         = "DBNAME"
+	dbhost         = "DBHOST"
+	dbport         = "DBPORT"
 )
 
-var Client *sql.DB
+var (
+	db_userid       = os.Getenv(dbuserid)
+	db_userpassword = os.Getenv(dbuserpassword)
+	db_name         = os.Getenv(dbname)
+	db_host         = os.Getenv(dbhost)
+	db_port         = os.Getenv(dbport)
+	Client          *sql.DB
+)
 
-func init(){
-	DSN := fmt.Sprintf("%s:%s@tcp(%s)/%s",db_userid, db_userpassword,db_host, db_name)
+func init() {
+	DSN := fmt.Sprintf("%s:%s@tcp(%s)/%s", db_userid, db_userpassword, db_host, db_name)
+	fmt.Println(DSN)
 	var err error
-	Client , err = sql.Open("mysql", DSN)
+	Client, err = sql.Open("mysql", DSN)
 	if err != nil {
 		panic(err)
 	}
@@ -28,4 +37,3 @@ func init(){
 	}
 	fmt.Println("Database configured succesfully")
 }
-

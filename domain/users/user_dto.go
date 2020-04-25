@@ -12,6 +12,8 @@ type  User struct {
 	Lastname string `json:"last_name"`
 	Email string `json:"email"`
 	Datecreated string `json:"date_created"`
+	Status string `json:"status"`
+	Password string `json:"password"`
 }
 
 // Validate .. Why should this method bind to datatype instead of package ?
@@ -21,6 +23,10 @@ func (input *User)Validate() *errors.RestErr {
 	input.Email = strings.TrimSpace(input.Email)
 	if userDB[input.Email] != nil {
 		return errors.NewRestErrBadRequest("email address already exist")
+	}
+	input.Password = strings.TrimSpace(input.Password)
+	if input.Password == "" {
+		return errors.NewRestErrBadRequest("Password cannot be empty")
 	}
 	return nil
 }
