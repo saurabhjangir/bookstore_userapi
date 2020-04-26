@@ -3,9 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/saurabhjangir/bookstore_userapi/domain/errors"
 	"github.com/saurabhjangir/bookstore_userapi/domain/users"
 	"github.com/saurabhjangir/bookstore_userapi/service"
+	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
 	log "github.com/saurabhjangir/bookstore_userapi/utils/logger"
 	"io/ioutil"
 	"net/http"
@@ -113,5 +113,30 @@ func SearchUser(c *gin.Context){
 		return
 	}
 	c.JSON(http.StatusOK, users)
+	return
+}
+
+func LoginUser(c *gin.Context){
+	log.Log.Info("login request received", c.Request)
+	bytes, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		log.Log.Info(err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	var user users.User
+	if err := json.Unmarshal(bytes, &user); err != nil {
+		log.Log.Info(err.Error())
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	user1, loginErr := service.Userservice.LoginUser(&user)
+	if loginErr != nil {
+		log.Log.Info(err.Error())
+		c.JSON(loginErr.Status, loginErr)
+		return
+	}
+	log.Log.Info("login Successful: ", user1)
+	c.JSON(http.StatusOK, user1)
 	return
 }

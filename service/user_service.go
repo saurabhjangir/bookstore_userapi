@@ -2,8 +2,8 @@ package service
 
 import (
 	"fmt"
-	"github.com/saurabhjangir/bookstore_userapi/domain/errors"
 	"github.com/saurabhjangir/bookstore_userapi/domain/users"
+	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
 	"strings"
 	"time"
 )
@@ -18,6 +18,7 @@ type UsersServiceInterface interface {
 	Get(int64) (*users.User, *errors.RestErr)
 	Delete(int64) *errors.RestErr
 	Search(string) ([]users.User, *errors.RestErr)
+	LoginUser(*users.User) (*users.User, *errors.RestErr)
 }
 
 func (s *UsersService)Create(input *users.User) (*users.User, *errors.RestErr){
@@ -80,4 +81,17 @@ func (s *UsersService)Search(status string) ([]users.User, *errors.RestErr){
 	var user users.User
 	user.Status = status
 	return user.FindByStatus()
+}
+
+func (s *UsersService)LoginUser(user *users.User) (*users.User, *errors.RestErr){
+	user.Email = strings.TrimSpace(user.Email)
+	user.Password = strings.TrimSpace(user.Password)
+	if user.Email == "" || user.Password == "" {
+		return nil, errors.NewRestErrBadRequest("email or password can't be empty")
+	}
+	dbErr := user.FindByEmailandPassword()
+	if dbErr != nil {
+		return nil , dbErr
+	}
+	return user, nil
 }

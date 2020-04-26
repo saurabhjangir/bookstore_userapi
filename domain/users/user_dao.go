@@ -1,10 +1,10 @@
 package users
 
 import (
-	"github.com/saurabhjangir/bookstore_userapi/datasources/mysql/users_db"
-	"github.com/saurabhjangir/bookstore_userapi/domain/errors"
-	log "github.com/saurabhjangir/bookstore_userapi/utils/logger"
 	"fmt"
+	"github.com/saurabhjangir/bookstore_userapi/datasources/mysql/users_db"
+	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
+	log "github.com/saurabhjangir/bookstore_userapi/utils/logger"
 )
 
 var (
@@ -38,11 +38,13 @@ func (input *User) Save() *errors.RestErr {
 func (input *User) Get() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryGetUserByID)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(err.Error())
 	}
 	defer stmt.Close()
 	result := stmt.QueryRow(input.Id)
 	if getErr := result.Scan(&input.Id, &input.Firstname, &input.Lastname, &input.Email, &input.Status, &input.Password, &input.Datecreated); getErr != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(getErr.Error())
 	}
 	return nil
@@ -51,11 +53,13 @@ func (input *User) Get() *errors.RestErr {
 func (input *User) Delete() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryDeleteUser)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(err.Error())
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(input.Id)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(err.Error())
 	}
 	return nil
@@ -64,11 +68,13 @@ func (input *User) Delete() *errors.RestErr {
 func (input *User) Update() *errors.RestErr {
 	stmt, err := users_db.Client.Prepare(queryUpdateUser)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(err.Error())
 	}
 	defer stmt.Close()
 	_, err = stmt.Exec(&input.Firstname, &input.Lastname, &input.Email, &input.Id)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return errors.NewRestErrInteralServer(err.Error())
 	}
 	return nil
@@ -78,6 +84,7 @@ func (input *User) FindByStatus() ([]User, *errors.RestErr) {
 	results := make([]User,0)
 	stmt, err := users_db.Client.Prepare(findByStatus)
 	if err != nil {
+		log.Log.Error(err.Error())
 		return nil, errors.NewRestErrInteralServer(err.Error())
 	}
 	defer stmt.Close()
@@ -99,4 +106,29 @@ func (input *User) FindByStatus() ([]User, *errors.RestErr) {
 		return nil, errors.NewRestErrResourceNotFound(fmt.Sprintf("No record found with status %s", input.Status))
 	}
 	return results, nil
+}
+
+
+func (input *User) FindByEmailandPassword() (*errors.RestErr) {
+	stmt, err := users_db.Client.Prepare(findByEmailandPassword)
+	if err != nil {
+		return errors.NewRestErrInteralServer(err.Error())
+	}
+	defer stmt.Close()
+	result := stmt.QueryRow(input.Email, input.Password, StatusActive)
+	if getErr := result.Scan(
+		&input.Id,
+		&input.Firstname,
+		&input.Lastname,
+		&input.Email,
+		&input.Status,
+		&input.Password,
+		&input.Datecreated); getErr != nil {
+		return errors.NewRestErrInteralServer(getErr.Error())
+	}
+	if err != nil {
+		log.Log.Info(err.Error())
+		return errors.NewRestErrInteralServer(err.Error())
+	}
+	return nil
 }

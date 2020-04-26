@@ -1,9 +1,9 @@
 package users
 
 import (
-	"github.com/saurabhjangir/bookstore_userapi/domain/errors"
-	"strings"
 	_ "github.com/saurabhjangir/bookstore_userapi/datasources/mysql/users_db"
+	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
+	"strings"
 )
 
 type  User struct {

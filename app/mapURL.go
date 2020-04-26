@@ -15,7 +15,6 @@ func mapURL(){
 	router.PATCH("/user/:userid", controller.UpdateUser)
 	router.PATCH("/user/:userid/", controller.UpdateUser)
 	router.GET("/internal/user/search", controller.SearchUser)
-	/*
-	put post and search with query param
-	 */
+	router.POST("/user/login/", controller.LoginUser)
+	router.POST("/user/login", controller.LoginUser)
 }

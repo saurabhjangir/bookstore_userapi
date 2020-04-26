@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/gin-gonic/gin"
-	log "github.com/saurabhjangir/bookstore_userapi/utils/logger"
+	l "github.com/saurabhjangir/bookstore_userapi/utils/logger"
 )
 
 var (
@@ -10,7 +10,7 @@ var (
 )
 
 func StartApplication() {
-	log.Log.Info("Initializing application")
+	l.Log.Info("Initializing bookstore user application ...")
 	mapURL()
 	router.Run(":3300")
 }
