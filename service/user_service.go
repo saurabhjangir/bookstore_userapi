@@ -3,7 +3,7 @@ package service
 import (
 	"fmt"
 	"github.com/saurabhjangir/bookstore_userapi/domain/users"
-	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
+	"github.com/saurabhjangir/utils-lib-golang/errors"
 	"strings"
 	"time"
 )

@@ -1,13 +1,20 @@
 package app
 
-import "github.com/saurabhjangir/bookstore_userapi/controller"
-
+import (
+	"github.com/saurabhjangir/bookstore_userapi/controller"
+)
+var (
+	authenticate = router.Group("", controller.AuthenticateRequest)
+)
 func mapURL(){
-	router.GET("/ping", controller.Pong)
+	authenticate = router.Group("", controller.AuthenticateRequest)
+
+	authenticate.GET("/ping", controller.Pong)
+
+	authenticate.GET("/user/:userid", controller.GetUser)
+	authenticate.GET("/user/:userid/", controller.GetUser)
 	router.POST("/user", controller.CreateUser)
 	router.POST("/user/", controller.CreateUser)
-	router.GET("/user/:userid", controller.GetUser)
-	router.GET("/user/:userid/", controller.GetUser)
 	router.DELETE("/user/:userid", controller.DeleteUser)
 	router.DELETE("/user/:userid/", controller.DeleteUser)
 	router.PUT("/user/:userid", controller.UpdateUser)

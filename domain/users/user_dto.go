@@ -2,7 +2,7 @@ package users
 
 import (
 	_ "github.com/saurabhjangir/bookstore_userapi/datasources/mysql/users_db"
-	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
+	"github.com/saurabhjangir/utils-lib-golang/errors"
 	"strings"
 )
 

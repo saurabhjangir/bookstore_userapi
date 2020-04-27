@@ -5,11 +5,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/saurabhjangir/bookstore_userapi/domain/users"
 	"github.com/saurabhjangir/bookstore_userapi/service"
-	"github.com/saurabhjangir/bookstore_userapi/utils/errors"
 	log "github.com/saurabhjangir/bookstore_userapi/utils/logger"
+	"github.com/saurabhjangir/oauth-client"
+	"github.com/saurabhjangir/utils-lib-golang/errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+)
+
+var (
+	AuthClient oauth_client.IoauthClient = &oauth_client.OauthClient{}
 )
 
 func getUserInputId(userId string) (int64, *errors.RestErr) {
@@ -18,6 +23,14 @@ func getUserInputId(userId string) (int64, *errors.RestErr) {
 		return Id, errors.NewRestErrBadRequest(err.Error())
 	}
 	return Id, nil
+}
+
+func AuthenticateRequest(c *gin.Context){
+	if err := AuthClient.AuthenticateRequest(c.Request); err != nil {
+		c.JSON(err.Status, err.Message)
+		c.Abort()
+		return
+	}
 }
 
 func CreateUser(c *gin.Context){
@@ -42,13 +55,7 @@ func CreateUser(c *gin.Context){
 }
 
 func GetUser(c *gin.Context){
-	log.Log.Info("Request received: Get User")
-	id, true := c.Params.Get("userid")
-	if !true {
-		c.JSON(http.StatusBadRequest, errors.NewRestErrBadRequest("http bad request"))
-		return
-	}
-	Id, err := strconv.ParseInt(id, 10 , 64)
+	Id, err := strconv.ParseInt(c.Param("userid"), 10 , 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errors.NewRestErrBadRequest("http bad request"))
 		return
@@ -58,7 +65,12 @@ func GetUser(c *gin.Context){
 		c.JSON(Resterr.Status, Resterr)
 		return
 	}
-	c.JSON(http.StatusCreated, user)
+	CallerId, _ := AuthClient.GetCallerID(c.Request)
+	if *CallerId != Id {
+		c.JSON(http.StatusCreated, user.Marshal(false))
+		return
+	}
+	c.JSON(http.StatusCreated, user.Marshal(true))
 	return
 }
 
